@@ -5,6 +5,7 @@ import java.util.List;
 public class MapeoTabla {
     String nombreTabla;
     List<TipoDeDato> tipoDeDato;
+    List<Datos> listaFilaDato;
 
     //
     public MapeoTabla(String nombreTabla, List<TipoDeDato> tipoDeDato) {
@@ -26,5 +27,13 @@ public class MapeoTabla {
 
     public void setTipoDeDato(List<TipoDeDato> tipoDeDato) {
         this.tipoDeDato = tipoDeDato;
+    }
+
+    public List<Datos> getListaDato() {
+        return listaFilaDato;
+    }
+
+    public void setListaDato(List<Datos> listaDato) {
+        this.listaFilaDato = listaDato;
     }
 }

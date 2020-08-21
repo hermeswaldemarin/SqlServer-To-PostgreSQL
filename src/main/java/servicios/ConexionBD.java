@@ -38,20 +38,17 @@ public class ConexionBD {
     /**
      * Abrir Objeto de conexion. 2do paso.
      */
-    public  Connection getConexionSqlServer(String puerto, String nombreBD, String usuario, String password)   {
+    public  Connection getConexionSqlServer(String ServerName, String puerto, String nombreBD, String usuario, String password)   {
 
         Connection conexionSql = null;
-
         //String connectionUrl = "jdbc:sqlserver://<server>:<port>;databaseName=AdventureWorks;user=<user>;password=<password>";
-        String connectionUrl = "jdbc:sqlserver://DESKTOP-OQC29UT:" + puerto + ";" + "databaseName=" + nombreBD+";"
+        String connectionUrl = "jdbc:sqlserver://"+ServerName+":" + puerto + ";" + "databaseName=" + nombreBD+";"
                 + "user=" + usuario + ";"+"password=" + password;
-
-        //TEST String url = "jdbc:sqlserver://DESKTOP-OQC29UT:1433;databaseName=Prubea;user=sa;password=";
         try {
 
             conexionSql = DriverManager.getConnection(connectionUrl);
             if(conexionSql!=null){
-                System.out.println("[INFO] La conexion se ha realizado de forma correcta..");
+                System.out.println("[INFO] - Conexión SQL Server exitosa!");
             }
         }catch (Exception exception){
             exception.printStackTrace();
@@ -70,10 +67,9 @@ public class ConexionBD {
             e.printStackTrace();
         }
     }
-    public static Connection getPostgresConnection(String puerto, String nombreBD, String usuario, String password) {
+    public static Connection getPostgresConnection(String ServerName, String puerto, String nombreBD, String usuario, String password) {
         Connection postGreSQLConnection = null;
-        String connectionUrl = "jdbc:postgresql://localhost:" + puerto + "/" + nombreBD;
-
+        String connectionUrl = "jdbc:postgresql://"+ServerName +":"+ puerto + "/" + nombreBD;
         try {
 
             postGreSQLConnection = DriverManager.getConnection(connectionUrl, usuario, password);

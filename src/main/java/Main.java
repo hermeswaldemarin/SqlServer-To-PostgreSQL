@@ -1,5 +1,7 @@
 import encapsulacion.Controladora;
+import servicios.ConexionBD;
 
+import java.sql.Connection;
 import java.util.Scanner;
 
 public class Main {
@@ -7,29 +9,56 @@ public class Main {
     public static void main(String[] args) throws ClassNotFoundException {
 
         //  -----------Datos SQL SERVER--------------
-        String sqlServerport = "1433"; //args[0];
-        String sqlServerdatabaseName = "Prubea"; //args[1];
-        String sqlServerUserName = "sa"; //args[2];
-        String sqlServerPassword = ""; //args[0];
+        String sqlServerName = "DESKTOP-OQC29UT";//args[0];
+        String sqlServerport = "1433"; //args[1];
+        String sqlServerdatabaseName = "Prubea"; //args[2];
+        String sqlServerUserName = "sa"; //args[3];
+        String sqlServerPassword = ""; //args[4];
 
         //  -----------Datos PostgreSQL--------------
+        String pgServerName = "localhost";//args[4];
+        String pgServerport = "5432"; //args[5];
+        String pgServerdatabaseName = "migracion"; //args[6];
+        String pgServerUserName = "postgres"; //args[7];
+        String pgServerPassword = "1234"; //args[8];
 
-        String pgServerport = "5432";
-        String pgServerdatabaseName = "migracion";
-        String pgServerUserName = "postgres";
-        String pgServerPassword = "1234";
+        System.out.println("Realizando Prueba de conexion...");
+        Connection conSQLTest = null;
+        Connection conPgTest = null;
+        conSQLTest = ConexionBD.getInstance().getConexionSqlServer(sqlServerName, sqlServerport, sqlServerdatabaseName, sqlServerUserName, sqlServerPassword);
+        conPgTest = ConexionBD.getInstance().getPostgresConnection(pgServerName, pgServerport, pgServerdatabaseName, pgServerUserName, pgServerPassword);
 
-        /**
-         *  Aplicancdo funciones...
-         */
+        if(conSQLTest!=null && conPgTest!=null) {
+            ConexionBD.getInstance().cerrarConexion(conSQLTest);
+            ConexionBD.getInstance().cerrarConexion(conPgTest);
+            System.out.println("\n==================================================================");
+            System.out.println("Aplicancdo funciones para migracion de datos");
+            System.out.println("==================================================================\n");
+            /**
+             *  Aplicancdo funciones...
+             */
 
-        //  Mapeando datos... SQL
-        Controladora.getInstance().setMapeoTabla(sqlServerport, sqlServerdatabaseName, sqlServerUserName, sqlServerPassword);
+            //  Mapeando datos... SQL
+            Controladora.getInstance().setMapeoTabla(sqlServerName, sqlServerport, sqlServerdatabaseName, sqlServerUserName, sqlServerPassword);
 
-        //  Creando tablas posgreSQL
-        Controladora.getInstance().creandoTablasPG(pgServerport, pgServerdatabaseName, pgServerUserName, pgServerPassword);
+            //  Creando tablas posgreSQL
+            Controladora.getInstance().creandoTablasPG(pgServerName, pgServerport, pgServerdatabaseName, pgServerUserName, pgServerPassword);
 
-        //  Migrando Datos a tablas de posgreSQL
+            //recuperando datos
 
+            //  Migrando Datos a tablas de posgreSQL
+            Connection conSQL = null;
+            conSQL = ConexionBD.getInstance().getConexionSqlServer(sqlServerName, sqlServerport, sqlServerdatabaseName, sqlServerUserName, sqlServerPassword);
+            Connection conPG = null;
+            conPG = ConexionBD.getInstance().getPostgresConnection(pgServerName, pgServerport, pgServerdatabaseName, pgServerUserName, pgServerPassword);
+            if(conSQL!=null && conPG!=null) {
+                System.out.println("\n==================================================================");
+                System.out.println("Migrando Datos a PostgreSQL");
+                System.out.println("==================================================================\n");
+                Controladora.getInstance().recuperandoDatosEnviandoAPG(conSQL, conPG);
+            }
+            ConexionBD.getInstance().cerrarConexion(conPG);
+            ConexionBD.getInstance().cerrarConexion(conSQL);
+        }
     }
 }
