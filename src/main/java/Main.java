@@ -7,22 +7,38 @@ import java.util.Scanner;
 public class Main {
     private static Scanner entradaEscaner= new Scanner (System.in);
     public static void main(String[] args) throws ClassNotFoundException {
-
+        Main nuevo = new Main();
+        nuevo.aplicandoFunciones(args);
+    }
+    public void aplicandoFunciones(String[] args){
         //  -----------Datos SQL SERVER--------------
-        String sqlServerName = "DESKTOP-OQC29UT";//args[0];
-        String sqlServerport = "1433"; //args[1];
-        String sqlServerdatabaseName = "Prubea"; //args[2];
-        String sqlServerUserName = "sa"; //args[3];
-        String sqlServerPassword = ""; //args[4];
+        String sqlServerName = args[0];
+        //"DESKTOP-OQC29UT";
+        //
+        String sqlServerport = args[1];
+        //"1433"; //args[1];
+        String sqlServerdatabaseName = args[2];
+        //"Prubea"; //args[2];
+        String sqlServerUserName = args[3];
+        //"sa"; //args[3];
+        String sqlServerPassword = args[4];
+        //""; //args[4];
 
         //  -----------Datos PostgreSQL--------------
-        String pgServerName = "localhost";//args[4];
-        String pgServerport = "5432"; //args[5];
-        String pgServerdatabaseName = "migracion"; //args[6];
-        String pgServerUserName = "postgres"; //args[7];
-        String pgServerPassword = "1234"; //args[8];
+        String pgServerName = args[5];
+        //"localhost";//args[4];
+        String pgServerport = args[6];
+        // "5432"; //args[5];
+        String pgServerdatabaseName = args[7];
+        //"migracion"; //args[6];
+        String pgServerUserName = args[8];
+        //"postgres"; //args[7];
+        String pgServerPassword = args[9];
+        //"1234"; //args[8];
 
+        System.out.println("\n==================================================================");
         System.out.println("Realizando Prueba de conexion...");
+        System.out.println("==================================================================\n");
         Connection conSQLTest = null;
         Connection conPgTest = null;
         conSQLTest = ConexionBD.getInstance().getConexionSqlServer(sqlServerName, sqlServerport, sqlServerdatabaseName, sqlServerUserName, sqlServerPassword);
@@ -60,5 +76,7 @@ public class Main {
             ConexionBD.getInstance().cerrarConexion(conPG);
             ConexionBD.getInstance().cerrarConexion(conSQL);
         }
+
     }
+
 }
