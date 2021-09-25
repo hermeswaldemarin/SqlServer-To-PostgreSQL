@@ -2,6 +2,7 @@ package servicios;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 
 /**
  * Referencias:
@@ -43,7 +44,7 @@ public class ConexionBD {
         Connection conexionSql = null;
         //String connectionUrl = "jdbc:sqlserver://<server>:<port>;databaseName=AdventureWorks;user=<user>;password=<password>";
         String connectionUrl = "jdbc:sqlserver://"+ServerName+":" + puerto + ";" + "databaseName=" + nombreBD+";"
-                + "user=" + usuario + ";"+"password=" + password;
+                + "user=" + usuario + ";"+"password=" + password + ";CharacterSet=UTF-8";
         try {
 
             conexionSql = DriverManager.getConnection(connectionUrl);
@@ -69,11 +70,14 @@ public class ConexionBD {
     }
     public static Connection getPostgresConnection(String ServerName, String puerto, String nombreBD, String usuario, String password) {
         Connection postGreSQLConnection = null;
-        String connectionUrl = "jdbc:postgresql://"+ServerName +":"+ puerto + "/" + nombreBD+"?allowEncodingChanges=true&client_encoding=LATIN1";
+        String connectionUrl = "jdbc:postgresql://"+ServerName +":"+ puerto + "/" + nombreBD+"?useUnicode=true&client_encoding=latin1&allowEncodingChanges=true";
         try {
 
             postGreSQLConnection = DriverManager.getConnection(connectionUrl, usuario, password);
             if (postGreSQLConnection != null) {
+               /* PreparedStatement st = postGreSQLConnection.prepareStatement("SET client_encoding = 'LATIN1'");
+                st.execute();
+                st.close();*/
                 //System.out.println("[INFO] - Conexión postgres exitosa!");
             }
         } catch (Exception e) {

@@ -3,6 +3,7 @@ package encapsulacion;
 import servicios.ConexionBD;
 import servicios.ConversoTipoDato;
 
+import java.nio.charset.Charset;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,7 +121,7 @@ public class Controladora {
     }
     private List<String> getTables(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
-        //String sqlTipoDato = "SELECT Table_Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND Table_Name not like '%_SQ' AND Table_Name  like 'CAMPOBD%' ORDER BY Table_Name";
+        //String sqlTipoDato = "SELECT Table_Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND Table_Name not like '%_SQ' AND Table_Name  like 'CRM_MAILRECEIVE%' ORDER BY Table_Name";
         String sqlTipoDato = "SELECT Table_Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND Table_Name not like '%_SQ' ORDER BY Table_Name";
         ResultSet tableSet = statement.executeQuery(sqlTipoDato);
         List<String> td = new ArrayList<String>();
@@ -268,16 +269,33 @@ public class Controladora {
 
 
 
-                    //if(!mt.getNombreTabla().equalsIgnoreCase("CAMPOBD"))return;
+                    //if(!mt.getNombreTabla().equalsIgnoreCase("CRM_MAILRECEIVE"))return;
                     misDatos = new ArrayList<Datos>();
+                    //String sql = "SELECT * FROM " + mt.getNombreTabla() + " WHERE ID_MAIL =182363";
                     String sql = "SELECT * FROM " + mt.getNombreTabla();
                     statement = conSQL.createStatement();
                     rs = statement.executeQuery(sql);
                     int linhas = 1;
                     while (rs.next()) {
+                        /*if(linhas < 4385){
+                            linhas++;
+                            continue;
+                        }*/
                         listaDato = new HashMap<String, Object>();
                         for (int i = 1; i <= mt.getTipoDeDato().size(); i++) {
-                            listaDato.put(mt.getTipoDeDato().get(i - 1).getNombreColumna(), rs.getObject(mt.getTipoDeDato().get(i - 1).getNombreColumna()));
+                            if(mt.getTipoDeDato().get(i - 1).getTipoDato().equalsIgnoreCase("varchar")
+                            || mt.getTipoDeDato().get(i - 1).getTipoDato().equalsIgnoreCase("text")){
+                                String returned = rs.getString(mt.getTipoDeDato().get(i - 1).getNombreColumna());
+                                String converted = null;
+                                if(returned!=null){
+                                    converted =returned.replaceAll("\u0000", " ");
+                                }
+
+                                listaDato.put(mt.getTipoDeDato().get(i - 1).getNombreColumna(), converted);
+                            }else{
+                                listaDato.put(mt.getTipoDeDato().get(i - 1).getNombreColumna(), rs.getObject(mt.getTipoDeDato().get(i - 1).getNombreColumna()));
+                            }
+
                         }
 
                         if (prepareStatement == null) {
@@ -309,7 +327,14 @@ public class Controladora {
 
                         int i = 1;
                         for (Map.Entry obj : listaDato.entrySet()) {
-                            prepareStatement.setObject(i++, obj.getValue());
+
+                            if(obj.getKey().toString().equalsIgnoreCase("ds_subjectsss")) {
+                                prepareStatement.setObject(i++, "teste a");
+                                System.out.println(obj.getValue());
+
+                            }else
+                                prepareStatement.setObject(i++, obj.getValue());
+
                         }
                         linhas++;
                         estado = prepareStatement.executeUpdate() > 0;
@@ -318,6 +343,7 @@ public class Controladora {
                     log += "\nRegistros criados na tabela ->  "+mt.getNombreTabla() + " : " + linhas;
 
                     System.out.println(log);
+
 
                 }catch (Exception e){
                     System.out.println(log + "\n ERROR");

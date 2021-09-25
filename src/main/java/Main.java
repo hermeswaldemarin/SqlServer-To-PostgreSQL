@@ -78,6 +78,15 @@ public class Main {
             }
 
 
+            while (executor.getActiveCount() > 0){
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.exit(0);
+
 
         }
 
