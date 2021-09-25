@@ -3,6 +3,7 @@ import encapsulacion.MapeoTabla;
 import servicios.ConexionBD;
 
 import java.sql.Connection;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -66,8 +67,12 @@ public class Main {
             //recuperando datos
 
             //  Migrando Datos a tablas de posgreSQL
+
+            System.out.println("Starting time " + new Date());
+
+
             ThreadPoolExecutor executor =
-                    (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
+                    (ThreadPoolExecutor) Executors.newFixedThreadPool(50);
             for (MapeoTabla mt : Controladora.getInstance().getMapeoTabla()) {
 
                 executor.submit(() -> {
@@ -85,6 +90,7 @@ public class Main {
                     e.printStackTrace();
                 }
             }
+            System.out.println("Finishing time " + new Date());
             System.exit(0);
 
 
