@@ -120,7 +120,8 @@ public class Controladora {
     }
     private List<String> getTables(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
-        String sqlTipoDato = "SELECT Table_Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND Table_Name not like '%_SQ' AND Table_Name  like 'CAMPOBD%' ORDER BY Table_Name";
+        //String sqlTipoDato = "SELECT Table_Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND Table_Name not like '%_SQ' AND Table_Name  like 'CAMPOBD%' ORDER BY Table_Name";
+        String sqlTipoDato = "SELECT Table_Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND Table_Name not like '%_SQ' ORDER BY Table_Name";
         ResultSet tableSet = statement.executeQuery(sqlTipoDato);
         List<String> td = new ArrayList<String>();
         while (tableSet.next()) {
@@ -267,7 +268,7 @@ public class Controladora {
 
 
 
-                    if(!mt.getNombreTabla().equalsIgnoreCase("CAMPOBD"))return;
+                    //if(!mt.getNombreTabla().equalsIgnoreCase("CAMPOBD"))return;
                     misDatos = new ArrayList<Datos>();
                     String sql = "SELECT * FROM " + mt.getNombreTabla();
                     statement = conSQL.createStatement();
