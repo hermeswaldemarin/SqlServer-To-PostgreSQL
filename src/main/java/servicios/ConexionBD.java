@@ -48,11 +48,11 @@ public class ConexionBD {
 
             conexionSql = DriverManager.getConnection(connectionUrl);
             if(conexionSql!=null){
-                System.out.println("[INFO] - Conexión SQL Server exitosa!");
+                //System.out.println("[INFO] - Conexión SQL Server exitosa!");
             }
         }catch (Exception exception){
             exception.printStackTrace();
-            System.out.println("Error al intentar conectar con la BD-sql server");
+            //System.out.println("Error al intentar conectar con la BD-sql server");
         }
         return  conexionSql;
     }
@@ -69,16 +69,16 @@ public class ConexionBD {
     }
     public static Connection getPostgresConnection(String ServerName, String puerto, String nombreBD, String usuario, String password) {
         Connection postGreSQLConnection = null;
-        String connectionUrl = "jdbc:postgresql://"+ServerName +":"+ puerto + "/" + nombreBD;
+        String connectionUrl = "jdbc:postgresql://"+ServerName +":"+ puerto + "/" + nombreBD+"?allowEncodingChanges=true&client_encoding=LATIN1";
         try {
 
             postGreSQLConnection = DriverManager.getConnection(connectionUrl, usuario, password);
             if (postGreSQLConnection != null) {
-                System.out.println("[INFO] - Conexión postgres exitosa!");
+                //System.out.println("[INFO] - Conexión postgres exitosa!");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("[Error] - Conexión - " + e.getMessage());
+            //System.out.println("[Error] - Conexión - " + e.getMessage());
         }
         return postGreSQLConnection;
     }

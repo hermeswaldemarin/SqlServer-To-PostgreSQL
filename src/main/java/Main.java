@@ -1,8 +1,11 @@
 import encapsulacion.Controladora;
+import encapsulacion.MapeoTabla;
 import servicios.ConexionBD;
 
 import java.sql.Connection;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class Main {
     private static Scanner entradaEscaner= new Scanner (System.in);
@@ -63,18 +66,19 @@ public class Main {
             //recuperando datos
 
             //  Migrando Datos a tablas de posgreSQL
-            Connection conSQL = null;
-            conSQL = ConexionBD.getInstance().getConexionSqlServer(sqlServerName, sqlServerport, sqlServerdatabaseName, sqlServerUserName, sqlServerPassword);
-            Connection conPG = null;
-            conPG = ConexionBD.getInstance().getPostgresConnection(pgServerName, pgServerport, pgServerdatabaseName, pgServerUserName, pgServerPassword);
-            if(conSQL!=null && conPG!=null) {
-                System.out.println("\n==================================================================");
-                System.out.println("Migrando Datos a PostgreSQL");
-                System.out.println("==================================================================\n");
-                Controladora.getInstance().recuperandoDatosEnviandoAPG(conSQL, conPG);
+            ThreadPoolExecutor executor =
+                    (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
+            for (MapeoTabla mt : Controladora.getInstance().getMapeoTabla()) {
+
+                executor.submit(() -> {
+                    Controladora.getInstance().recuperandoDatosEnviandoAPG(mt, sqlServerName, sqlServerport, sqlServerdatabaseName, sqlServerUserName, sqlServerPassword, pgServerName, pgServerport, pgServerdatabaseName, pgServerUserName, pgServerPassword);
+                });
+
+
             }
-            ConexionBD.getInstance().cerrarConexion(conPG);
-            ConexionBD.getInstance().cerrarConexion(conSQL);
+
+
+
         }
 
     }
