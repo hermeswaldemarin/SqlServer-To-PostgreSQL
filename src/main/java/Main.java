@@ -58,7 +58,7 @@ public class Main {
             Controladora.getInstance().setMapeoTabla(sqlServerName, sqlServerport, sqlServerdatabaseName, sqlServerUserName, sqlServerPassword);
 
             //  Creando tablas posgreSQL
-            Controladora.getInstance().creandoTablasPG(pgServerName, pgServerport, pgServerdatabaseName, pgServerUserName, pgServerPassword);
+            //Controladora.getInstance().creandoTablasPG(pgServerName, pgServerport, pgServerdatabaseName, pgServerUserName, pgServerPassword);
 
             //recuperando datos
 

@@ -5,7 +5,9 @@ import servicios.ConversoTipoDato;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class Controladora {
@@ -118,7 +120,7 @@ public class Controladora {
     }
     private List<String> getTables(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
-        String sqlTipoDato = "SELECT Table_Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
+        String sqlTipoDato = "SELECT Table_Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND Table_Name not like '%_SQ' ORDER BY Table_Name";
         ResultSet tableSet = statement.executeQuery(sqlTipoDato);
         List<String> td = new ArrayList<String>();
         while (tableSet.next()) {
@@ -202,17 +204,35 @@ public class Controladora {
         PreparedStatement prepareStatement;
         if (con != null) {
             for (Datos d:mt.getListaDato()) {
-                sql = "INSERT INTO " + mt.getNombreTabla() + " values(";
-                for (int i = 0; i < d.listaDato.size() ; i++) {
-                    sql +="'"+d.getListaDato().get(i)+"'";
-                    if(i!=d.getListaDato().size()-1){
-                        sql+=",";
-                    }
+                sql = "INSERT INTO dbo." + mt.getNombreTabla() + " (";
+                String fields = "";
+                for (String coluna: d.listaDato.keySet()) {
+                    if(!fields.equalsIgnoreCase(""))
+                        fields+=",";
+
+                    fields +=coluna;
+
                 }
+                sql += fields;
+                sql += ") values (";
+                String values = "";
+                for (String coluna: d.listaDato.keySet()) {
+                    if(!values.equalsIgnoreCase(""))
+                        values+=",";
+                    values +="?";
+
+                }
+                sql += values;
                 sql += ");";
                 System.out.println("Salidad -> "+sql);
                 try {
                     prepareStatement = con.prepareStatement(sql);
+
+                    int i = 1;
+                    for (Map.Entry obj: d.listaDato.entrySet()) {
+                        prepareStatement.setObject(i++, obj.getValue());
+                    }
+
                     estado = prepareStatement.executeUpdate() > 0;
                 } catch (SQLException throwables) {
                     System.out.println("[ERROR] -- Ocurrio un error al intentar enviar datos a la tabla! ");
@@ -222,25 +242,82 @@ public class Controladora {
         }
     }
     public void recuperandoDatosEnviandoAPG(Connection conSql, Connection conPG){
-        List<String> listaDato ;
+        Map<String,Object> listaDato ;
         Statement statement;
         List<Datos> misDatos;
+
+        ResultSet rs = null;
         if(conSql!=null){
             try {
                 for (MapeoTabla mt : getMapeoTabla()) {
-                    misDatos = new ArrayList<Datos>();
-                    String sql = "SELECT * FROM "+mt.getNombreTabla();
-                    statement = conSql.createStatement();
-                    ResultSet rs = statement.executeQuery(sql);
-                    while (rs.next()) {
-                        listaDato = new ArrayList<String>();
-                        for (int i = 1; i <= mt.getTipoDeDato().size(); i++) {
-                            listaDato.add(rs.getString(i));
+
+                    System.out.println("\n------------CANTIDADES------------");
+                    System.out.println("Columnas ->  "+mt.getTipoDeDato().size());
+                    boolean estado = false;
+                    String sqlInsert = null;
+                    PreparedStatement prepareStatement = null;
+                    try {
+
+
+
+
+                        misDatos = new ArrayList<Datos>();
+                        String sql = "SELECT * FROM " + mt.getNombreTabla();
+                        statement = conSql.createStatement();
+                        rs = statement.executeQuery(sql);
+                        int linhas = 1;
+                        while (rs.next()) {
+                            listaDato = new HashMap<String, Object>();
+                            for (int i = 1; i <= mt.getTipoDeDato().size(); i++) {
+                                listaDato.put(mt.getTipoDeDato().get(i - 1).getNombreColumna(), rs.getObject(mt.getTipoDeDato().get(i - 1).getNombreColumna()));
+                            }
+
+                            if (prepareStatement == null) {
+                                sqlInsert = "INSERT INTO dbo." + mt.getNombreTabla() + " (";
+                                String fields = "";
+                                for (String coluna : listaDato.keySet()) {
+                                    if (!fields.equalsIgnoreCase(""))
+                                        fields += ",";
+
+                                    fields += coluna;
+
+                                }
+                                sqlInsert += fields;
+                                sqlInsert += ") values (";
+                                String values = "";
+                                for (String coluna : listaDato.keySet()) {
+                                    if (!values.equalsIgnoreCase(""))
+                                        values += ",";
+                                    values += "?";
+
+                                }
+                                sqlInsert += values;
+                                sqlInsert += ");";
+                                System.out.println("Salidad -> " + sqlInsert);
+
+                                prepareStatement = conPG.prepareStatement(sqlInsert);
+                            }
+
+
+                            int i = 1;
+                            for (Map.Entry obj : listaDato.entrySet()) {
+                                prepareStatement.setObject(i++, obj.getValue());
+                            }
+                            linhas++;
+                            estado = prepareStatement.executeUpdate() > 0;
                         }
-                        misDatos.add( new Datos(listaDato));
+
+                        System.out.println("Registros criados na tabela  "+mt.getNombreTabla() + " : " + linhas);
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }finally {
+                        if(prepareStatement!=null){
+                            prepareStatement.close();
+                            rs.close();
+                        }
                     }
-                    mt.setListaDato(misDatos);
-                    enviandoDatosAPostgresql(conPG,mt);
+
 
                 }
             } catch (SQLException throwables) {

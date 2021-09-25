@@ -1,18 +1,19 @@
 package encapsulacion;
 
 import java.util.List;
+import java.util.Map;
 
 public class Datos {
-    List<String> listaDato;
+    Map<String, Object> listaDato;
 
-    public Datos(List<String> listaDato) {
+    public Datos(Map<String, Object> listaDato) {
         this.listaDato = listaDato;
     }
-    public List<String> getListaDato() {
+    public Map<String, Object> getListaDato() {
         return listaDato;
     }
 
-    public void setListaDato(List<String> listaDato) {
+    public void setListaDato(Map<String, Object> listaDato) {
         this.listaDato = listaDato;
     }
 }
